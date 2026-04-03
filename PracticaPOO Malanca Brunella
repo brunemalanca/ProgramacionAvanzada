@@ -1,0 +1,259 @@
+import java.util.Scanner;
+
+// Clase Libro
+
+class Libro {
+
+    private String titulo;
+    private String autor;
+    private String isbn;
+    private int anioPublicacion;
+    private boolean disponible;
+
+    public Libro(String titulo, String autor, String isbn, int anioPublicacion) { //CONSTRUCTOR
+        this.titulo = titulo; // ← CORREGIDO
+        this.autor = autor;
+        this.isbn = isbn;
+        this.anioPublicacion = anioPublicacion;
+        this.disponible = true;
+    }
+
+    public Libro(String titulo, String autor) { //CONSTRUCTOR EN CASO DE NO TENER ISBN Y AÑO DE PUBLICACIÓN
+        this.titulo = titulo;
+        this.autor = autor;
+        this.isbn = "Sin ISBN";
+        this.anioPublicacion = 0;
+        this.disponible = true;
+    }
+
+    public void mostrarInfo() { //INFORMACIÓN DEL LIBRO
+        System.out.println("-----------------------------");
+        System.out.println("Título     : " + titulo);
+        System.out.println("Autor      : " + autor);
+        System.out.println("ISBN       : " + isbn);
+        System.out.println("Año        : " + (anioPublicacion == 0 ? "Desconocido" : anioPublicacion));
+        System.out.println("Disponible : " + (disponible ? "Sí" : "No"));
+        System.out.println("-----------------------------");
+    }
+
+    public boolean prestar() { //CANCELAR DISPONIBILIDIDAD DE UN LIBRO
+        if (disponible) {
+            disponible = false;
+            return true;
+        }
+        return false;
+    }
+
+    public void devolver() { //DEVOLVER DISPONIBILIDIDAD DE UN LIBRO
+        disponible = true;
+    }
+
+    public String obtenerResumen() { 
+        return "\"" + titulo + "\" de " + autor + " (" + anioPublicacion + ")";
+    }
+
+    public String getTitulo() { return titulo; } //GETTERS
+    public String getAutor() { return autor; }
+    public String getIsbn() { return isbn; }
+    public int getAnioPublicacion() { return anioPublicacion; }
+    public boolean isDisponible() { return disponible; }
+}
+
+// Clase Biblioteca
+
+class Biblioteca {
+
+    private String nombre;
+    private Libro[] catalogo;
+    private int cantidad;
+    private static final int CAPACIDAD_MAX = 100;
+
+    public Biblioteca(String nombre) { //CONSTRUCTOR
+        this.nombre = nombre;
+        this.catalogo = new Libro[CAPACIDAD_MAX];
+        this.cantidad = 0;
+    }
+
+    public boolean agregarLibro(Libro libro) { //FUNCIÓN AGREGAR UN LIBRO MANUALMENTE
+        if (cantidad < CAPACIDAD_MAX) {
+            catalogo[cantidad] = libro;
+            cantidad++;
+            return true; // sin mensaje al inicio
+        }
+        return false;
+    }
+
+    public Libro buscarPorTitulo(String titulo) { //BUSCAR LIBRO POR SU TÍTULO
+        for (int i = 0; i < cantidad; i++) {
+            if (catalogo[i].getTitulo().equalsIgnoreCase(titulo)) {
+                return catalogo[i];
+            }
+        }
+        return null;
+    }
+
+    public Libro buscarPorISBN(String isbn) { //BUSCAR LIBRO POR SU ISBN (EN CASO DE TENER)
+        for (int i = 0; i < cantidad; i++) {
+            if (catalogo[i].getIsbn().equalsIgnoreCase(isbn)) {
+                return catalogo[i];
+            }
+        }
+        return null;
+    }
+
+    public boolean prestarLibro(String titulo) { 
+        Libro libro = buscarPorTitulo(titulo);
+        if (libro == null) {
+            System.out.println("✘ Libro \"" + titulo + "\" no encontrado.");
+            return false;
+        }
+        if (libro.prestar()) {
+            System.out.println("✔ Libro prestado: " + libro.obtenerResumen());
+            return true;
+        } else {
+            System.out.println("✘ El libro \"" + titulo + "\" no está disponible.");
+            return false;
+        }
+    }
+
+    public void devolverLibro(String titulo) {
+        Libro libro = buscarPorTitulo(titulo);
+        if (libro == null) {
+            System.out.println("✘ Libro \"" + titulo + "\" no encontrado.");
+        } else {
+            libro.devolver();
+            System.out.println("✔ Libro devuelto: " + libro.obtenerResumen());
+        }
+    }
+
+    public void mostrarCatalogo() {
+        System.out.println("\n════════════════════════════");
+        System.out.println("  Total de libros: " + cantidad);
+
+        if (cantidad == 0) {
+            System.out.println("  (Catálogo vacío)");
+        } else {
+            for (int i = 0; i < cantidad; i++) {
+                catalogo[i].mostrarInfo();
+            }
+        }
+    }
+
+    public void mostrarLibros(boolean soloDisponibles) { //MOSTRAR LIBROS
+        System.out.println("\n--- " + (soloDisponibles ? "Libros disponibles" : "Libros prestados") + " ---");
+        boolean hayAlguno = false;
+
+        for (int i = 0; i < cantidad; i++) {
+            if (catalogo[i].isDisponible() == soloDisponibles) {
+                System.out.println(" • " + catalogo[i].obtenerResumen());
+                hayAlguno = true;
+            }
+        }
+
+        if (!hayAlguno) System.out.println(" (ninguno)");
+    }
+}
+
+// ─────────────────────────────
+// Clase principal (Main)
+// ─────────────────────────────
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner scanner = new Scanner(System.in);
+        Biblioteca bib = new Biblioteca("Biblioteca Central");
+
+        // Libros iniciales (sin imprimir)
+        bib.agregarLibro(new Libro("Cien Años de Soledad", "Gabriel Garcia Marquez", "978-0-06-088328-7", 1967));
+        bib.agregarLibro(new Libro("El Principito", "Antoine de Saint-Exupery", "978-0-15-601219-5", 1943));
+        bib.agregarLibro(new Libro("1984", "George Orwell", "978-0-45-228285-3", 1949));
+        bib.agregarLibro(new Libro("Don Quijote", "Miguel de Cervantes"));
+
+        int opcion = -1;
+
+        while (opcion != 0) {
+
+            System.out.println("\n══════════════════════════════");
+            System.out.println("     BIBLIOTECA CENTRAL      ");
+            System.out.println("══════════════════════════════");
+            System.out.println("  1. Ver catalogo completo    ");
+            System.out.println("  2. Agregar libro            ");
+            System.out.println("  3. Prestar libro            ");
+            System.out.println("  4. Devolver libro           ");
+            System.out.println("  5. Buscar libro por titulo  ");
+            System.out.println("  6. Ver libros disponibles   ");
+            System.out.println("  7. Ver libros prestados     ");
+            System.out.println("  0. Salir                    ");
+            System.out.println("══════════════════════════════");
+            System.out.print("Elegi una opcion: ");
+
+            opcion = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcion) {
+
+                case 1:
+                    bib.mostrarCatalogo();
+                    break;
+
+                case 2:
+                    System.out.print("Titulo: ");
+                    String titulo = scanner.nextLine();
+                    System.out.print("Autor: ");
+                    String autor = scanner.nextLine();
+                    System.out.print("ISBN (Enter para omitir): ");
+                    String isbn = scanner.nextLine();
+                    System.out.print("Año de publicacion (0 para omitir): ");
+                    int anio = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (isbn.isEmpty()) {
+                        bib.agregarLibro(new Libro(titulo, autor));
+                    } else {
+                        bib.agregarLibro(new Libro(titulo, autor, isbn, anio));
+                    }
+
+                    System.out.println("✔ Libro agregado correctamente.");
+                    break;
+
+                case 3:
+                    System.out.print("Titulo del libro a prestar: ");
+                    bib.prestarLibro(scanner.nextLine());
+                    break;
+
+                case 4:
+                    System.out.print("Titulo del libro a devolver: ");
+                    bib.devolverLibro(scanner.nextLine());
+                    break;
+
+                case 5:
+                    System.out.print("Titulo a buscar: ");
+                    Libro encontrado = bib.buscarPorTitulo(scanner.nextLine());
+                    if (encontrado != null) {
+                        encontrado.mostrarInfo();
+                    } else {
+                        System.out.println("No se encontro ningun libro.");
+                    }
+                    break;
+
+                case 6:
+                    bib.mostrarLibros(true);
+                    break;
+
+                case 7:
+                    bib.mostrarLibros(false);
+                    break;
+
+                case 0:
+                    System.out.println("\nHasta luego!");
+                    break;
+
+                default:
+                    System.out.println("Opcion no valida.");
+            }
+        }
+
+        scanner.close();
+    }
+}
