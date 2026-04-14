@@ -1,0 +1,35 @@
+
+package facade;
+
+/**
+ * @author bruni
+ */
+// Subsistemas complejos
+class Luces { void atenuar() { System.out.println("Luces apagadas."); } }
+class Proyector { void encender() { System.out.println("Proyector en modo cine."); } }
+class Sonido { void setVolumen(int v) { System.out.println("Volumen al " + v + "%."); } }
+
+// La Fachada (Simplifica el uso de los subsistemas)
+class HomeTheaterFacade {
+    private Luces luces = new Luces();
+    private Proyector proyector = new Proyector();
+    private Sonido sonido = new Sonido();
+
+    public void comenzarPelicula() {
+        System.out.println("Preparando todo para la peli...");
+        luces.atenuar();
+        proyector.encender();
+        sonido.setVolumen(70);
+    }
+}
+
+public class Facade {
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // El cliente solo interactúa con la fachada, no con los cables internos
+        HomeTheaterFacade cine = new HomeTheaterFacade();
+        cine.comenzarPelicula(); // Con un solo método se activan 3 sistemas
+    }
+}
