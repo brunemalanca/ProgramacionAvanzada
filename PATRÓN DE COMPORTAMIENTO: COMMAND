@@ -1,0 +1,41 @@
+package command;
+
+// Interfaz del Comando
+interface Operacion {
+    void ejecutar();
+}
+
+// Receptor (La clase que realmente sabe hacer el trabajo)
+class Luz {
+    public void encender() { System.out.println("La luz está ENCENDIDA."); }
+}
+
+// Comando Concreto
+class EncenderLuzCommand implements Operacion {
+    private Luz luz;
+    public EncenderLuzCommand(Luz l) { this.luz = l; }
+    
+    @Override
+    public void ejecutar() { luz.encender(); }
+}
+
+// Invocador (El que lanza el comando, ej: un Botón)
+class ControlRemoto {
+    private Operacion comando;
+    public void setComando(Operacion c) { this.comando = c; }
+    public void presionarBoton() { comando.ejecutar(); }
+}
+
+public class Command {
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        Luz miLuz = new Luz(); // El objeto real
+        Operacion comandoEncender = new EncenderLuzCommand(miLuz); // El comando envuelve al objeto
+        
+        ControlRemoto control = new ControlRemoto(); // El invocador
+        control.setComando(comandoEncender); // Le pasamos el comando
+        control.presionarBoton(); // Se ejecuta la acción
+    }
+}
