@@ -1,0 +1,47 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Builder;
+
+/**
+ * @author bruni
+ */
+// Clase Producto
+class Pizza {
+    public String masa = "";
+    public String salsa = "";
+    public String topping = "";
+
+    public void mostrar() {
+        System.out.println("Pizza con masa " + masa + ", salsa " + salsa + " y " + topping);
+    }
+}
+
+// Clase Builder (El constructor paso a paso)
+class PizzaBuilder {
+    private Pizza pizza = new Pizza();
+
+    public PizzaBuilder conMasa(String m) { pizza.masa = m; return this; }
+    public PizzaBuilder conSalsa(String s) { pizza.salsa = s; return this; }
+    public PizzaBuilder conTopping(String t) { pizza.topping = t; return this; }
+    
+    public Pizza build() { return pizza; }
+}
+
+public class Builder {
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // Se construye el objeto de forma fluida y legible
+        Pizza miPizza = new PizzaBuilder()
+                            .conMasa("Fina")
+                            .conSalsa("Tomate")
+                            .conTopping("Muzarella")
+                            .build();
+        
+        miPizza.mostrar(); // Imprime el resultado final
+    }
+}
