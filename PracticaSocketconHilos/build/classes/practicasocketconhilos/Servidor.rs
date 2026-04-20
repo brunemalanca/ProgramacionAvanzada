@@ -1,2 +1,0 @@
-Servidor$ManejadorCliente
-Servidor
